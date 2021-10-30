@@ -3,6 +3,15 @@ name = "sgx-keyreq"
 version = "0.1.0"
 resolver = "2"
 edition = "2018"
+authors = ["Julian Popescu <jpopesculian@gmail.com>"]
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+homepage = "https://github.com/riddleandcode/sgx-keyreq"
+documentation = "https://docs.rs/sgx-keyreq/"
+repository = "https://github.com/riddleandcode/sgx-keyreq"
+description = "Provides a stable/no-std compatible library for requesting SGX keys"
+keywords = ["sgx", "encryption", "key", "cryptography", "trusted"]
+categories = ["cryptography", "no-std"]
 
 [dependencies]
 sgx-isa = "0.3.3"
