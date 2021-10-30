@@ -3,13 +3,13 @@ use core::mem::MaybeUninit;
 use sgx_isa::{Keyrequest, Report, Targetinfo};
 
 #[repr(align(16))]
-pub struct Align16<T>(pub T);
+struct Align16<T>(pub T);
 
 #[repr(align(128))]
-pub struct Align128<T>(pub T);
+struct Align128<T>(pub T);
 
 #[repr(align(512))]
-pub struct Align512<T>(pub T);
+struct Align512<T>(pub T);
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd)]
 #[repr(u32)]
