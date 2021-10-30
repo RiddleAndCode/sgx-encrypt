@@ -1,17 +1,12 @@
 [package]
-name = "sgx-encrypt"
+name = "sgx-keyreq"
 version = "0.1.0"
 resolver = "2"
 edition = "2018"
 
 [dependencies]
-aes = { version = "0.7.5", features = ["ctr"] }
-cipher = "0.3.0"
-hmac = "0.11.0"
-pbkdf2 = { version = "0.9.0", default-features = false }
-rdrand = "0.8.1"
+generic-array = "0.14.4"
 sgx-isa = "0.3.3"
-sha2 = { version = "0.9.8", features = ["asm"] }
 
 [build-dependencies]
 cc = "1.0.71"

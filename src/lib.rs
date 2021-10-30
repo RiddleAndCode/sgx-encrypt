@@ -1,8 +1,7 @@
-pub extern crate cipher;
-pub extern crate sgx_isa;
+pub use sgx_isa;
 
 pub mod ecalls;
 mod ffi;
-mod sgx_cipher;
+mod keyrequest;
 
-pub use sgx_cipher::SealKeyrequest;
+pub use keyrequest::SealKeyrequest;
