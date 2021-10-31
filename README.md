@@ -1,6 +1,12 @@
-# sgx-encrypt
+# sgx-keyreq
 
-Encryption helpers for SGX
+A library for simplifying the retrieval of keys in an SGX enclave. The library is both
+compatible with `no_std` environments as well as the stable rust compiler.
+
+```rust
+let mut key: [u8; 32] = RdRand::new()?.gen();
+sgx_keyreq::get_key(Default::default(), &mut key)?;
+```
 
 ## Testing
 
@@ -11,3 +17,5 @@ cargo +nightly test --target x86_64-fortanix-unknown-sgx
 # or
 cargo +nightly sgx-test
 ```
+
+License: MIT OR Apache-2.0

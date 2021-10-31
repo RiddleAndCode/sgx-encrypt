@@ -13,8 +13,16 @@ description = "Provides a stable/no-std compatible library for requesting SGX ke
 keywords = ["sgx", "encryption", "key", "cryptography", "trusted"]
 categories = ["cryptography", "no-std"]
 
+[features]
+default = ["std"]
+std = []
+
 [dependencies]
 sgx-isa = "0.3.3"
 
 [build-dependencies]
 cc = "1.0.71"
+
+[dev-dependencies]
+rand = "0.8.4"
+rdrand = "0.8.1"

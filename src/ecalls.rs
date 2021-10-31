@@ -1,4 +1,7 @@
+//! Low level `ENCLU` calls for extracting key information from the CPU
+
 use crate::ffi;
+use core::fmt;
 use core::mem::MaybeUninit;
 use sgx_isa::{Keyrequest, Report, Targetinfo};
 
@@ -11,10 +14,10 @@ struct Align128<T>(pub T);
 #[repr(align(512))]
 struct Align512<T>(pub T);
 
+/// The error status of a malformed `ENCLU` call
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd)]
 #[repr(u32)]
 pub enum ECallStatus {
-    Success = ffi::STATUS_SUCCESS,
     InvalidAttribute = ffi::STATUS_INVALID_ATTRIBUTE,
     InvalidCPUSVN = ffi::STATUS_INVALID_CPUSVN,
     InvalidISVSVN = ffi::STATUS_INVALID_ISVSVN,
@@ -25,7 +28,6 @@ pub enum ECallStatus {
 impl From<u32> for ECallStatus {
     fn from(code: u32) -> Self {
         match code {
-            0 => ECallStatus::Success,
             ffi::STATUS_INVALID_ATTRIBUTE => ECallStatus::InvalidAttribute,
             ffi::STATUS_INVALID_CPUSVN => ECallStatus::InvalidCPUSVN,
             ffi::STATUS_INVALID_ISVSVN => ECallStatus::InvalidISVSVN,
@@ -35,6 +37,24 @@ impl From<u32> for ECallStatus {
     }
 }
 
+impl fmt::Display for ECallStatus {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            ECallStatus::InvalidAttribute => f.write_str("ENCLU error: Invalid attribute"),
+            ECallStatus::InvalidCPUSVN => f.write_str("ENCLU error: Invalid CPUSVN"),
+            ECallStatus::InvalidISVSVN => f.write_str("ENCLU error: Invalid CPUISVN"),
+            ECallStatus::InvalidKeyname => f.write_str("ENCLU error: Invalid Keyname"),
+            ECallStatus::Unknown => f.write_str("ENCLU error: Unknown"),
+        }
+    }
+}
+
+#[cfg(feature = "std")]
+impl std::error::Error for ECallStatus {}
+
+/// Performs an `ENCLU[EGETKEY]` call. See the [x86
+/// instruction](https://www.felixcloutier.com/x86/egetkey) or refer to the SGX SDK docs for more
+/// information
 pub fn egetkey(request: Keyrequest) -> Result<[u8; 16], ECallStatus> {
     let mut out = MaybeUninit::<Align16<[u8; 16]>>::uninit();
     unsafe {
@@ -43,12 +63,15 @@ pub fn egetkey(request: Keyrequest) -> Result<[u8; 16], ECallStatus> {
             out.as_mut_ptr() as *mut u8,
         );
         match error {
-            0 => Ok(out.assume_init().0),
+            ffi::STATUS_SUCCESS => Ok(out.assume_init().0),
             error => Err(ECallStatus::from(error)),
         }
     }
 }
 
+/// Performs an `ENCLU[EREPORT]` call. See the [x86
+/// instruction](https://www.felixcloutier.com/x86/ereport) or refer to the SGX SDK docs for more
+/// information
 pub fn ereport(targetinfo: Targetinfo, reportdata: [u8; 64]) -> Result<Report, ECallStatus> {
     let mut out = MaybeUninit::<Align512<Report>>::uninit();
     unsafe {
@@ -58,7 +81,7 @@ pub fn ereport(targetinfo: Targetinfo, reportdata: [u8; 64]) -> Result<Report, E
             out.as_mut_ptr() as *mut u8,
         );
         match error {
-            0 => Ok(out.assume_init().0),
+            ffi::STATUS_SUCCESS => Ok(out.assume_init().0),
             error => Err(ECallStatus::from(error)),
         }
     }
